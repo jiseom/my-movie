@@ -1,12 +1,8 @@
 package com.project.mymovie.domain;
 
-
-
 import lombok.*;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
 
 @Setter @Getter
 @EqualsAndHashCode(of = "id")
