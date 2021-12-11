@@ -3,6 +3,7 @@ package com.project.mymovie.domain;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Setter @Getter
 @EqualsAndHashCode(of = "id")
@@ -22,7 +23,7 @@ public class Account {
 
     private String password;
 
-    private String emailToken;
+    private String emailVerificationToken;
 
     private LocalDateTime emailTokenCreatedDate;
 
@@ -44,6 +45,10 @@ public class Account {
 
     private boolean movieUpdatedByWeb;
 
-
-
+    /**
+     * 회원가입 인증 토큰 생성
+     */
+    public void generateEmailVerificationToken() {
+        this.emailVerificationToken = UUID.randomUUID().toString();
+    }
 }
