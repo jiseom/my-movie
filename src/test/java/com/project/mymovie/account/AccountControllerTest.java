@@ -1,6 +1,7 @@
 package com.project.mymovie.account;
 
 import com.project.mymovie.domain.Account;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -33,9 +38,17 @@ class AccountControllerTest {
     @MockBean
     JavaMailSender javaMailSender;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void beforeEach() {
         accountRepository.deleteAll();
+    }
+
+    @BeforeEach
+    public void passwordEncoder() throws Exception{
+        passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
 
@@ -88,6 +101,10 @@ class AccountControllerTest {
         Account account = accountRepository.findByEmail("jiseon@email.com");
         assertNotNull(account);
         assertNotNull(account.getEmailVerificationToken());
+//        assertNotEquals(account.getPassword(),"12345678");
+        String encodedPassword = passwordEncoder.encode(account.getPassword());
+        assertThat(passwordEncoder.matches(account.getPassword(), encodedPassword)).isTrue();
+        assertThat(encodedPassword).contains("{bcrypt}");
         then(javaMailSender).should().send(any(SimpleMailMessage.class));
 
     }

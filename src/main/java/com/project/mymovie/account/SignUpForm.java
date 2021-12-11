@@ -22,7 +22,7 @@ public class SignUpForm {
     private String nickname;
 
     @NotBlank
-    @Length(min = 4, max = 10) //TODO :비밀번호 정규식으로 변경
+    @Length(min = 4, max = 50) //TODO :비밀번호 정규식으로 변경
     //자주쓰이는 정규식 적어도 소문자 하나, 대문자 하나, 숫자 하나가 포함되어 있는 문자열(8글자 이상 15글자 이하) -
     //올바른 암호 형식을 확인할 때 사용될 수 있음: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,15}/
     private String password;

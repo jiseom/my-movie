@@ -4,6 +4,7 @@ import com.project.mymovie.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -15,7 +16,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
-
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원정보를 저장한 후 회원가입 인증 이메일을 보내서 회원가입을 완료시키는 메소드
@@ -37,7 +38,7 @@ public class AccountService {
         Account account = Account.builder()
                 .email(signUpForm.getEmail())
                 .nickname(signUpForm.getNickname())
-                .password(signUpForm.getPassword())
+                .password(passwordEncoder.encode(signUpForm.getPassword()))
                 .movieUpdatedByEmail(true)
                 .movieUpdatedByWeb(true)
                 .build();
