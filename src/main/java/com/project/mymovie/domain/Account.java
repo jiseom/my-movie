@@ -29,6 +29,8 @@ public class Account {
 
     private boolean emailVerified;
 
+    private boolean enabled;
+
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
@@ -46,9 +48,19 @@ public class Account {
     private boolean movieUpdatedByWeb;
 
     /**
-     * 회원가입 인증 토큰 생성
+     * 회원가입 인증 토큰 생성 (무작위로 생성된 고유한 값을 가질 것)
      */
     public void generateEmailVerificationToken() {
         this.emailVerificationToken = UUID.randomUUID().toString();
+    }
+
+    public void completeSignUp() {
+        this.setEmailVerified(true);
+        this.setEnabled(true);
+        this.setJoinAt(LocalDateTime.now());
+    }
+
+    public boolean isValidToken(String token) {
+     return this.getEmailVerificationToken().equals(token);
     }
 }
