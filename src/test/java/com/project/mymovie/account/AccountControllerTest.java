@@ -1,6 +1,7 @@
 package com.project.mymovie.account;
 
 import com.project.mymovie.domain.Account;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,15 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -42,6 +47,9 @@ class AccountControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AccountService accountService;
 
     @BeforeEach
     void beforeEach() {
@@ -132,18 +140,43 @@ class AccountControllerTest {
                 .nickname("지선")
                 .password("12345678")
                 .build();
-        Account newAccount = accountRepository.save(account);
-        newAccount.generateEmailVerificationToken();
+        accountRepository.save(account);
+        account.generateEmailVerificationToken();
         //트랜잭션을 걸어주어야 accountRepository.save(newAccount); 로 업데이트 되는것
         mockMvc.perform(get("/check-email-link")
-                        .param("token", newAccount.getEmailVerificationToken())
-                        .param("email", newAccount.getEmail()))
+                        .param("token", account.getEmailVerificationToken())
+                        .param("email", account.getEmail()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeExists("nickname"))
                 .andExpect(view().name("account/checked-email"))
-                .andExpect(authenticated().withUsername("지선"));
-
+                .andExpect(authenticated().withUsername("지선"))
+                .andExpect(model().attributeExists("account"));
+        Account newAccount = accountRepository.findByEmail(account.getEmail());
+        accountService.login(newAccount);
+        assertTrue(newAccount.isEmailVerified());
+        assertTrue(newAccount.isEnabled());
+        assertNotNull(newAccount.getJoinAt());
     }
+
+    @DisplayName("1시간 간격으로 이메일 인증 재전송")
+    @Test
+    void resendEmail() throws Exception {
+        Account account = Account.builder()
+                .email("jiseon@email.com")
+                .nickname("지선")
+                .password("12345678")
+                .emailTokenCreatedDate(LocalDateTime.now().minusHours(2))
+                .build();
+        accountRepository.save(account);
+        accountService.login(account);
+        mockMvc.perform(get("/resend-confirm-email"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/"));
+    }
+
+
+
 }

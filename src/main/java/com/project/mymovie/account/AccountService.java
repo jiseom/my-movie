@@ -56,7 +56,7 @@ public class AccountService {
      * newAccount에게 회원가입 인증 이메일 전송
      * @param newAccount (회원이 입력한 데이터를 저장한 newAccount)
      */
-    private void sendSignUpVerifyEmail(Account newAccount) {
+    public void sendSignUpVerifyEmail(Account newAccount) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(newAccount.getEmail());
         mailMessage.setSubject("회원 가입 인증,");
@@ -70,8 +70,8 @@ public class AccountService {
      * @param account
      */
     public void login(Account account) {
-        UsernamePasswordAuthenticationToken token= new UsernamePasswordAuthenticationToken(
-                account.getNickname(),
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                new UserAccount(account),
                 account.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_USER")));
         SecurityContextHolder.getContext().setAuthentication(token);
