@@ -25,6 +25,7 @@ public class AccountService {
 
     /**
      * 회원정보를 저장한 후 회원가입 인증 이메일을 보내서 회원가입을 완료시키는 메소드
+     *
      * @param signUpForm
      */
     public Account saveAccountAndSendEmail(SignUpForm signUpForm) {
@@ -37,6 +38,7 @@ public class AccountService {
 
     /**
      * 회원 회원가입 정보 저장
+     *
      * @param signUpForm (회원가입 폼)
      * @return 입력 받은 데이터를 저장
      */
@@ -54,6 +56,7 @@ public class AccountService {
 
     /**
      * newAccount에게 회원가입 인증 이메일 전송
+     *
      * @param newAccount (회원이 입력한 데이터를 저장한 newAccount)
      */
     public void sendSignUpVerifyEmail(Account newAccount) {
@@ -67,6 +70,7 @@ public class AccountService {
 
     /**
      * 인증을 마친 계정을 회원가입이 완료됨과 동시에 자동으로 로그인시킨다.
+     *
      * @param account
      */
     public void login(Account account) {
@@ -77,4 +81,5 @@ public class AccountService {
         SecurityContextHolder.getContext().setAuthentication(token);
 
     }
+
 }
