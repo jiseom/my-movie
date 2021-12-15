@@ -8,6 +8,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
@@ -61,8 +62,8 @@ public class AccountController {
             model.addAttribute("error", "wrong.token");
             return view;
         }
-        account.completeSignUp();
-        accountService.login(account);
+        accountService.completeSignUp(account);
+
         model.addAttribute("account", account);
         model.addAttribute("nickname", account.getNickname());
         return view;
@@ -96,4 +97,19 @@ public class AccountController {
             accountService.sendSignUpVerifyEmail(account);
             return "redirect:/";
     }
+
+    @GetMapping("/profile/{nickname}")
+    public String viewProfile(@PathVariable String nickname,@CurrentAccount Account account,Model model) {
+        Account byNickname = accountRepository.findByNickname(nickname);
+        if (nickname == null) {
+            throw new IllegalArgumentException(nickname +"에 해당하는 사용자가 없습니다.");
+            //적합하지 않거나 적절하지 못한 인자를 메소드에 넘겨주었을 때 발생하는 예외
+        }
+        model.addAttribute(byNickname);
+        model.addAttribute("isOwner", byNickname.equals(account));
+        return "account/profile";
+    }
+
+
+
 }

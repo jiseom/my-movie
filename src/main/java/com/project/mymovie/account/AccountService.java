@@ -82,4 +82,8 @@ public class AccountService {
 
     }
 
+    public void completeSignUp(Account account) {
+        account.completeSignUp();
+        login(account);
+    }
 }
