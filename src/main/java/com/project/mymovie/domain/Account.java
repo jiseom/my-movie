@@ -1,8 +1,11 @@
 package com.project.mymovie.domain;
 
 import lombok.*;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Setter @Getter
@@ -16,6 +19,10 @@ public class Account {
     @Id
     @GeneratedValue
     private Long id;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<Genre> genres = new HashSet<>();
 
     private String email;
 
